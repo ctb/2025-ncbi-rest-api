@@ -1,0 +1,11 @@
+name: branchwater-dev
+channels:
+    - conda-forge
+    - bioconda
+    - defaults
+dependencies:
+    - sourmash>=4.8.12,<5
+    - pip
+    - requests
+    - python==3.12
+    - snakemake-minimal
