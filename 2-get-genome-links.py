@@ -43,7 +43,6 @@ def main():
     if os.path.exists(args.save_pickle):
         with open(args.save_pickle, 'rb') as fp:
             link_res, acc_to_names = load(fp)
-        print(f"loaded {len(acc_to_names)} successes.")
 
         for r in link_res:
             for link in r['assembly_links']:
