@@ -37,12 +37,20 @@ def main():
 
     link_res = []
     acc_to_names = {}
+    accs_done = set()
 
     # load unfinished results
     if os.path.exists(args.save_pickle):
         with open(args.save_pickle, 'rb') as fp:
             link_res, acc_to_names = load(fp)
         print(f"loaded {len(acc_to_names)} successes.")
+
+        for r in link_res:
+            for link in r['assembly_links']:
+                acc = link['accession']
+                accs_done.add(acc)
+
+        print(f'loaded {len(accs_done)} already-retrieved links!')
 
     with open(args.dataset_reports_pickle, 'rb') as fp:
         res = load(fp)
@@ -59,7 +67,7 @@ def main():
             if common_name:
                 name = f"{common_name} ({name})"
             #print(f"{acc} {name}")
-            if acc not in acc_to_names:
+            if acc not in accs_done:
                 accs.append(acc)
                 acc_to_names[acc] = name
 
