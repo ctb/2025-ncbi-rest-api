@@ -1,5 +1,5 @@
-TEST_MODE="--test-mode"
-#TEST_MODE=""
+#TEST_MODE="--test-mode"
+TEST_MODE=""
 NAME="euk"
 
 rule all:
