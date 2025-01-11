@@ -9,3 +9,4 @@ dependencies:
     - requests
     - python==3.12
     - snakemake-minimal
+    - pandas

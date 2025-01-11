@@ -40,7 +40,9 @@ def main():
     link_res = []
     acc_to_names = {}
 
-    for r in res:
+    print(f'loaded {len(res)} chunks')
+
+    for chunk_num, r in enumerate(res):
         accs = []
         for report in r['reports']:
             acc = report['accession']
@@ -51,10 +53,11 @@ def main():
                 name = f"{common_name} ({name})"
             #print(f"{acc} {name}")
             accs.append(acc)
+            assert acc not in acc_to_names
             acc_to_names[acc] = name
 
         for i in range(0, len(accs), 100):
-            print(f'... grabbing links for {i}-{i+100} of {len(accs)}')
+            print(f'... grabbing links for {i}-{i+100} of {len(accs)} - chunk {chunk_num} of {len(res)}')
             x = get_links(accs[i:i+100])
             link_res.append(x)
             if args.test_mode:
