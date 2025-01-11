@@ -3,6 +3,7 @@ import sys
 import argparse
 import os
 from pickle import dump, load
+import time
 
 import requests
 import pandas as pd
@@ -63,6 +64,7 @@ def main():
             if args.test_mode:
                 print('test mode - breaking')
                 break
+            time.sleep(1)
 
         if args.test_mode:
             print('test mode - breaking 2')
