@@ -34,12 +34,18 @@ def main():
     p.add_argument('-o', '--save-pickle', required=True)
     p.add_argument('--test-mode', action='store_true')
     args = p.parse_args()
-    
-    with open(args.dataset_reports_pickle, 'rb') as fp:
-        res = load(fp)
 
     link_res = []
     acc_to_names = {}
+
+    # load unfinished results
+    if os.path.exists(args.save_pickle):
+        with open(args.save_pickle, 'rb') as fp:
+            link_res, acc_to_names = load(fp)
+        print(f"loaded {len(acc_to_names)} successes.")
+
+    with open(args.dataset_reports_pickle, 'rb') as fp:
+        res = load(fp)
 
     print(f'loaded {len(res)} chunks')
 
@@ -53,13 +59,18 @@ def main():
             if common_name:
                 name = f"{common_name} ({name})"
             #print(f"{acc} {name}")
-            accs.append(acc)
-            assert acc not in acc_to_names
-            acc_to_names[acc] = name
+            if acc not in acc_to_names:
+                accs.append(acc)
+                acc_to_names[acc] = name
 
         for i in range(0, len(accs), 100):
             print(f'... grabbing links for {i}-{i+100} of {len(accs)} - chunk {chunk_num} of {len(res)}')
-            x = get_links(accs[i:i+100])
+            try:
+                x = get_links(accs[i:i+100])
+            except:
+                print('failure. punting.')
+                break
+
             link_res.append(x)
             if args.test_mode:
                 print('test mode - breaking')
