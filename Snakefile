@@ -37,7 +37,8 @@ rule get_tax:
 
 rule get_links:
     input:
-        "outputs/{NAME}-dataset-reports.pickle"
+        "outputs/{NAME}-dataset-reports.pickle",
+        "outputs/round1-{NAME}-linkspickle",
     output:
         "outputs/{NAME}-links.pickle"
     shell: """

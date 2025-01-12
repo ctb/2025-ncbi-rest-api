@@ -32,6 +32,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument('dataset_reports_pickle')
     p.add_argument('-o', '--save-pickle', required=True)
+    p.add_argument('-i', '--previous-links-pickle')
     p.add_argument('--test-mode', action='store_true')
     args = p.parse_args()
 
@@ -40,8 +41,8 @@ def main():
     accs_done = set()
 
     # load unfinished results
-    if os.path.exists(args.save_pickle):
-        with open(args.save_pickle, 'rb') as fp:
+    if args.previous_links_pickle:
+        with open(args.previous_links_pickle, 'rb') as fp:
             link_res, acc_to_names = load(fp)
 
         for r in link_res:
