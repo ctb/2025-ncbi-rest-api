@@ -1,3 +1,5 @@
 .snakemake
 *.pickle
 *~
+sketches/
+outputs/
