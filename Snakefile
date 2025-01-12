@@ -1,6 +1,10 @@
-TEST_MODE="--test-mode"
-#TEST_MODE=""
-NAME="euk"
+# @CTB config-ify
+#TEST_MODE="--test-mode"
+TEST_MODE=""
+NAME="diplomonadida"
+TAX_ID="5738"
+# NAME="euk"
+# TAX_ID="2759"
 
 rule all:
     input:
@@ -10,7 +14,7 @@ rule get_tax:
     output:
         f"{NAME}-dataset-reports.pickle"
     shell: """
-       ./1-get-by-tax.py -o {output} {TEST_MODE}
+       ./1-get-by-tax.py --taxons {TAX_ID} -o {output} {TEST_MODE}
     """
 
 
