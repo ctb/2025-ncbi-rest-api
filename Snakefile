@@ -4,7 +4,8 @@ TEST_MODE=True
 NAMES_TO_TAX_ID = {
     'eukaryotes': 2759,
     'metazoa': 33208,
-    'plants': 33090
+    'plants': 33090,
+    'fungi': 4751,
     }
 
 if TEST_MODE:
