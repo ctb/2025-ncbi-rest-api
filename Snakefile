@@ -1,12 +1,19 @@
 # @CTB config-ify
 #TEST_MODE="--test-mode"
 TEST_MODE=""
-NAME="diplomonadida"
-TAX_ID="5738"
+#NAME="diplomonadida"
+#TAX_ID="5738"
 # NAME="euk"
 # TAX_ID="2759"
 
-rule all:
+NAME="metazoa"
+TAX_ID="33208"
+
+rule default:
+    input:
+        f"{NAME}-links.csv"
+
+rule sketch:
     input:
         f"{NAME}.sig.zip"
 
