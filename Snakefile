@@ -1,55 +1,64 @@
 # @CTB config-ify
-#TEST_MODE="--test-mode"
-TEST_MODE=""
-#NAME="diplomonadida"
-#TAX_ID="5738"
-# NAME="euk"
-# TAX_ID="2759"
+TEST_MODE=True
 
-NAME="metazoa"
-TAX_ID="33208"
+NAMES_TO_TAX_ID = {
+    'eukaryotes': 2759,
+    'metazoa': 33208,
+    'plants': 33090
+    }
+
+if TEST_MODE:
+    NAMES_TO_TAX_ID = {
+        'giardia': 5740,
+        'toxo': 5810,
+        }
+    TEST_MODE_FLAG="--test-mode"
+else:
+    TEST_MODE_FLAG=""
 
 rule default:
     input:
-        f"{NAME}-links.csv"
+        expand("outputs/{NAME}-links.csv", NAME=set(NAMES_TO_TAX_ID))
 
-rule sketch:
+rule sketchall:
     input:
-        f"{NAME}.sig.zip"
+        expand("sketches/{NAME}.sig.zip", NAME=set(NAMES_TO_TAX_ID))
 
 rule get_tax:
     output:
-        f"{NAME}-dataset-reports.pickle"
+        "outputs/{NAME}-dataset-reports.pickle"
+    params:
+        tax_id = lambda w: NAMES_TO_TAX_ID[w.NAME]
     shell: """
-       ./1-get-by-tax.py --taxons {TAX_ID} -o {output} {TEST_MODE}
+       ./1-get-by-tax.py --taxons {params.tax_id} -o {output} {TEST_MODE_FLAG}
     """
 
 
 rule get_links:
     input:
-        f"{NAME}-dataset-reports.pickle"
+        "outputs/{NAME}-dataset-reports.pickle"
     output:
-        f"{NAME}-links.pickle"
+        "outputs/{NAME}-links.pickle"
     shell: """
-       ./2-get-genome-links.py {input} -o {output} {TEST_MODE}
+       ./2-get-genome-links.py {input} -o {output} {TEST_MODE_FLAG}
     """
 
 rule parse_links:
     input:
-        f"{NAME}-links.pickle",
+        "outputs/{NAME}-links.pickle",
     output: 
-        f"{NAME}-links.csv",
+        "outputs/{NAME}-links.csv",
     shell: """
         ./3-parse-links.py {input} -o {output}
     """
 
 rule gbsketch:
     input:
-        f"{NAME}-links.csv",
+        "outputs/{NAME}-links.csv",
     output:
-        sigs=f"{NAME}.sig.zip",
-        check_fail=f"{NAME}-check-fail.txt",
-        fail=f"{NAME}-fail.txt",
+        sigs="sketches/{NAME}.sig.zip",
+        check_fail="sketches/{NAME}.gbsketch-check-fail.txt",
+        fail="sketches/{NAME}.gbsketch-fail.txt",
     shell: """
         sourmash scripts gbsketch {input} -n 1 -p k=21,k=31,k=51,dna \
             --failed {output.fail} --checksum-fail {output.check_fail} \

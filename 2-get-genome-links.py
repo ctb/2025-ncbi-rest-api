@@ -56,6 +56,11 @@ def main():
 
     print(f'loaded {len(res)} chunks')
 
+    # bad pickle?
+    if 'reports' not in res[0]:
+        print(res)
+        sys.exit(0)
+
     for chunk_num, r in enumerate(res):
         accs = []
         for report in r['reports']:

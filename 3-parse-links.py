@@ -15,7 +15,6 @@ def main():
     with open(args.links_pickle, 'rb') as fp:
         (res, acc_to_res) = load(fp)
 
-    print('accession,name,ftp_path')
     fp = open(args.save_csv, 'w', newline='')
     w = csv.writer(fp)
     w.writerow(['accession', 'name', 'ftp_path'])
