@@ -1,5 +1,5 @@
 # @CTB config-ify
-TEST_MODE=True
+TEST_MODE=False
 
 NAMES_TO_TAX_ID = {
     'eukaryotes': 2759,
@@ -8,11 +8,14 @@ NAMES_TO_TAX_ID = {
     'fungi': 4751,
     }
 
+SKETCH_NAMES = ['fungi']
+
 if TEST_MODE:
     NAMES_TO_TAX_ID = {
         'giardia': 5740,
         'toxo': 5810,
         }
+    SKETCH_NAMES = set(NAMES_TO_TAX_ID)
     TEST_MODE_FLAG="--test-mode"
 else:
     TEST_MODE_FLAG=""
@@ -21,9 +24,9 @@ rule default:
     input:
         expand("outputs/{NAME}-links.csv", NAME=set(NAMES_TO_TAX_ID))
 
-rule sketchall:
+rule sketch:
     input:
-        expand("sketches/{NAME}.sig.zip", NAME=set(NAMES_TO_TAX_ID))
+        expand("sketches/{NAME}.sig.zip", NAME=SKETCH_NAMES)
 
 rule get_tax:
     output:
@@ -37,12 +40,12 @@ rule get_tax:
 
 rule get_links:
     input:
-        "outputs/{NAME}-dataset-reports.pickle",
-        "outputs/round1-{NAME}-linkspickle",
+        datasets="outputs/{NAME}-dataset-reports.pickle",
+        round1="outputs/round1-{NAME}-links.pickle",
     output:
         "outputs/{NAME}-links.pickle"
     shell: """
-       ./2-get-genome-links.py {input} -o {output} {TEST_MODE_FLAG}
+       ./2-get-genome-links.py {input.datasets} -i {input.round1} -o {output} {TEST_MODE_FLAG}
     """
 
 rule parse_links:
