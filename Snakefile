@@ -8,7 +8,7 @@ NAMES_TO_TAX_ID = {
     'fungi': 4751,
     }
 
-SKETCH_NAMES = ['fungi']
+SKETCH_NAMES = ['fungi', 'metazoa', 'euk-other']
 
 if TEST_MODE:
     NAMES_TO_TAX_ID = {

@@ -39,7 +39,9 @@ def main():
     to_sub = set(links_sub)
 
     if not to_sub.issubset(the_source):
-        print(f"WARNING: links to subtract are not all in the source... continung.")
+        print(f"WARNING: links to subtract are not all in the source...")
+        print(f"{len(to_sub - the_source)} missing - is this expected?")
+        print(f"continuing...")
 
     keep = the_source - to_sub
     print(f"{len(keep)} accessions left after subtraction.")
