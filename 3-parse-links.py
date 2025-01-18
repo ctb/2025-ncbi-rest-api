@@ -17,15 +17,14 @@ def main():
 
     fp = open(args.save_csv, 'w', newline='')
     w = csv.writer(fp)
-    w.writerow(['accession', 'name', 'ftp_path'])
+    w.writerow(['accession', 'name'])
     n_written = 0
 
     for r in res:
         for link in r['assembly_links']:
             if link['assembly_link_type'] == 'FTP_LINK':
                 accession = link['accession']
-                ftp_link = link['resource_link']
-                w.writerow([accession, f"{accession} {acc_to_res[accession]}", ftp_link])
+                w.writerow([accession, f"{accession} {acc_to_res[accession]}"])
                 n_written += 1
 
     print(f"wrote {n_written}")

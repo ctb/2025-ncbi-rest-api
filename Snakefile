@@ -8,7 +8,7 @@ NAMES_TO_TAX_ID = {
     'fungi': 4751,
     }
 
-SKETCH_NAMES = ['fungi', 'metazoa', 'euk-other']
+SKETCH_NAMES = ['fungi', 'euk-other', 'metazoa-100.2']
 
 if TEST_MODE:
     NAMES_TO_TAX_ID = {
@@ -61,11 +61,11 @@ rule gbsketch:
     input:
         "outputs/{NAME}-links.csv",
     output:
-        sigs="sketches/{NAME}.sig.zip",
+        sigs=protected("sketches/{NAME}.sig.zip"),
         check_fail="sketches/{NAME}.gbsketch-check-fail.txt",
         fail="sketches/{NAME}.gbsketch-fail.txt",
     shell: """
-        sourmash scripts gbsketch {input} -n 1 -p k=21,k=31,k=51,dna \
+        sourmash scripts gbsketch {input} -n 5 -p k=21,k=31,k=51,dna \
             --failed {output.fail} --checksum-fail {output.check_fail} \
             -o {output.sigs}
     """
