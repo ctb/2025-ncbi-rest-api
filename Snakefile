@@ -1,5 +1,5 @@
 # @CTB config-ify
-TEST_MODE=False
+TEST_MODE=True
 
 NAMES_TO_TAX_ID = {
     'eukaryotes': 2759,
@@ -37,24 +37,13 @@ rule get_tax:
        ./1-get-by-tax.py --taxons {params.tax_id} -o {output} {TEST_MODE_FLAG}
     """
 
-
-rule get_links:
-    input:
-        datasets="outputs/{NAME}-dataset-reports.pickle",
-        round1="outputs/round1-{NAME}-links.pickle",
-    output:
-        "outputs/{NAME}-links.pickle"
-    shell: """
-       ./2-get-genome-links.py {input.datasets} -i {input.round1} -o {output} {TEST_MODE_FLAG}
-    """
-
 rule parse_links:
     input:
-        "outputs/{NAME}-links.pickle",
+        datasets="outputs/{NAME}-dataset-reports.pickle",
     output: 
         "outputs/{NAME}-links.csv",
     shell: """
-        ./3-parse-links.py {input} -o {output}
+        ./2-output-directsketch-csv.py {input} -o {output}
     """
 
 rule gbsketch:

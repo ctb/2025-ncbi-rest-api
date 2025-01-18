@@ -1,4 +1,8 @@
 #! /usr/bin/env python
+"""
+Do a taxon query and just save all the results to a pickle file, for use
+by later scripts.
+"""
 import sys
 import argparse
 import os
@@ -8,14 +12,16 @@ from urllib.parse import quote
 import requests
 import pandas as pd
 
-API_KEY=os.environ["NCBI_API_KEY"]
-
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('--taxons', nargs='+', default=["2759"]) # eukaryotes
     p.add_argument('-o', '--save-pickle', required=True)
     p.add_argument('--test-mode', action='store_true')
     args = p.parse_args()
+
+    API_KEY=os.environ.get("NCBI_API_KEY")
+    if not API_KEY:
+        assert 0, "you must set the NCBI_API_KEY environment variable"
 
     headers = {}
     basic_params = {}
@@ -48,7 +54,7 @@ def main():
             break
 
     page_size = basic_params['page_size']
-    print(f'saving {~len(save)*page_size} results')
+    print(f'saving ~{len(save)*page_size} results')
     with open(args.save_pickle, 'wb') as fp:
         dump(save, fp)
 
