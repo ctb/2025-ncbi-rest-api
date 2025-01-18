@@ -12,7 +12,15 @@ ADD_OTHER=['outputs/bilateria-minus-vertebrates-links.csv',
            'outputs/eukaryotes-other-links.csv']
            
 
-SKETCH_NAMES = ['fungi', 'euk-other', 'metazoa-100.2']
+# omit really large ones and already done:
+# - plants
+# - vertebrates
+# - bilateria minus vertebrates
+
+SKETCH_NAMES = ['fungi',
+                'eukaryotes-other',
+                'metazoa-minus-bilateria',
+                ]
 
 TEST_NAMES_TO_TAX_ID = {
     'giardia': 5740,
@@ -61,7 +69,7 @@ rule get_tax:
     output:
         "outputs/{NAME}-dataset-reports.pickle"
     params:
-        tax_id = lambda w: NAMES_TO_TAX_ID[w.NAME]
+        tax_id = lambda w: { **NAMES_TO_TAX_ID, **TEST_NAMES_TO_TAX_ID}[w.NAME]
     shell: """
        ./1-get-by-tax.py --taxons {params.tax_id} -o {output}
     """
