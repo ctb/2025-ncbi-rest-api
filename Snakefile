@@ -1,6 +1,3 @@
-# @CTB config-ify
-TEST_MODE=False
-
 NAMES_TO_TAX_ID = {
     'eukaryotes': 2759,
     'metazoa': 33208,
@@ -11,27 +8,54 @@ NAMES_TO_TAX_ID = {
     }
 
 ADD_OTHER=['outputs/bilateria-minus-vertebrates-links.csv',
-           'outputs/metazoa-minus-bilateria-links.csv']
+           'outputs/metazoa-minus-bilateria-links.csv',
+           'outputs/eukaryotes-other-links.csv']
+           
 
 SKETCH_NAMES = ['fungi', 'euk-other', 'metazoa-100.2']
 
-if TEST_MODE:
-    NAMES_TO_TAX_ID = {
-        'giardia': 5740,
-        'toxo': 5810,
-        'diplomonads': 5738,
-        }
-    SKETCH_NAMES = set(NAMES_TO_TAX_ID)
-    ADD_OTHER=['outputs/diplomonads-minus-giardia-links.csv']
+TEST_NAMES_TO_TAX_ID = {
+    'giardia': 5740,
+    'toxo': 5810,
+    'diplomonads': 5738,
+}
+TEST_ADD_OTHER=['outputs/diplomonads-minus-giardia-links.csv']
 
 rule default:
     input:
         expand("outputs/{NAME}-links.csv", NAME=set(NAMES_TO_TAX_ID)),
         ADD_OTHER,
+        'outputs/upsetplot.png',
+
+rule test:
+    input:
+        expand("outputs/{NAME}-links.csv", NAME=set(TEST_NAMES_TO_TAX_ID)),
+        TEST_ADD_OTHER,
+        'outputs/test-upsetplot.png',
 
 rule sketch:
     input:
         expand("sketches/{NAME}.sig.zip", NAME=SKETCH_NAMES)
+
+rule upset_plot:
+    input:
+        expand("outputs/{NAME}-links.csv", NAME=set(NAMES_TO_TAX_ID)),
+        ADD_OTHER,
+    output:
+        'outputs/upsetplot.png',
+    shell: """
+        ./make-upset.py {input} -o {output}
+    """
+        
+rule test_upset_plot:
+    input:
+        expand("outputs/{NAME}-links.csv", NAME=set(TEST_NAMES_TO_TAX_ID)),
+        TEST_ADD_OTHER,
+    output:
+        'outputs/test-upsetplot.png',
+    shell: """
+        ./make-upset.py {input} -o {output}
+    """
 
 rule get_tax:
     output:
@@ -79,6 +103,20 @@ rule make_metazoa_sub_bilateria_csv:
         sub='outputs/bilateria-links.csv',
     output:
         'outputs/metazoa-minus-bilateria-links.csv',
+    shell: """
+        ./subtract-links.py -1 {input.sub_from} \
+            -2 {input.sub} -o {output}
+    """
+
+rule eukaryotes_other_csv:
+    input:
+        sub_from='outputs/eukaryotes-links.csv',
+        sub=['outputs/metazoa-links.csv',
+             'outputs/plants-links.csv',
+             'outputs/fungi-links.csv',
+             ]
+    output:
+        'outputs/eukaryotes-other-links.csv',
     shell: """
         ./subtract-links.py -1 {input.sub_from} \
             -2 {input.sub} -o {output}
