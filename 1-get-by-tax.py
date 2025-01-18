@@ -12,6 +12,10 @@ from urllib.parse import quote
 import requests
 import pandas as pd
 
+
+NCBI_API_URL = "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/"
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('--taxons', nargs='+', default=["2759"]) # eukaryotes
@@ -40,21 +44,22 @@ def main():
     save = [data]
 
     while 'next_page_token' in data:
-        print(f'getting next page; have', len(save))
+        print(f'1-get-by-tax for {taxons}: getting next page; have', len(save))
         next_page = data['next_page_token']
         params = dict(basic_params) # copy params -> update with next page
         params['page_token'] = next_page
         
-        r = requests.get(f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/{taxons}/dataset_report", headers=headers, params=params)
+        r = requests.get(NCBI_API_URL + f"{taxons}/dataset_report",
+                         headers=headers, params=params)
         data = r.json()
         save.append(data)
 
-        if args.test_mode:
+        if args.test_mode:      # only grab one page
             print('test mode - breaking')
             break
 
     page_size = basic_params['page_size']
-    print(f'saving ~{len(save)*page_size} results')
+    print(f'1-get-by-tax for {taxons}: saving ~{len(save)*page_size} results')
     with open(args.save_pickle, 'wb') as fp:
         dump(save, fp)
 

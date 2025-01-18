@@ -1,5 +1,7 @@
 #! /usr/bin/env python
-
+"""
+Subtract two collections of links CSVs.
+"""
 import sys
 import argparse
 import csv
@@ -21,6 +23,7 @@ def main():
                    help='links CSVs - subtract')
     p.add_argument('-o', '--output',
                    help='output links CSV')
+    p.add_argument('-f', '--force', action='store_true')
     args = p.parse_args()
 
     links_source = {}
@@ -41,7 +44,11 @@ def main():
     if not to_sub.issubset(the_source):
         print(f"WARNING: links to subtract are not all in the source...")
         print(f"{len(to_sub - the_source)} missing - is this expected?")
-        print(f"continuing...")
+        if args.force:
+            print(f"continuing...")
+        else:
+            print(f"failing.")
+            sys.exit(-1)
 
     keep = the_source - to_sub
     print(f"{len(keep)} accessions left after subtraction.")
@@ -50,13 +57,12 @@ def main():
         with open(args.output, "w", newline='') as outfp:
             n_saved = 0
             w = csv.writer(outfp)
-            w.writerow(['accession', 'name', 'ftp_path'])
+            w.writerow(['accession', 'name'])
 
             for acc in keep:
                 row = links_source[acc]
                 w.writerow([row['accession'],
-                            row['name'],
-                            row['ftp_path']])
+                            row['name']])
                 n_saved += 1
             print(f"saved {n_saved} rows to '{args.output}'")
 
