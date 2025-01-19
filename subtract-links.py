@@ -57,12 +57,13 @@ def main():
         with open(args.output, "w", newline='') as outfp:
             n_saved = 0
             w = csv.writer(outfp)
-            w.writerow(['accession', 'name'])
+            w.writerow(['accession', 'name', 'taxid'])
 
             for acc in keep:
                 row = links_source[acc]
                 w.writerow([row['accession'],
-                            row['name']])
+                            row['name'],
+                            row['taxid']])
                 n_saved += 1
             print(f"saved {n_saved} rows to '{args.output}'")
 

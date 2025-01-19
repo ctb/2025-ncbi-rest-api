@@ -98,6 +98,15 @@ rule parse_links:
         ./2-output-directsketch-csv.py {input} -o {output}
     """
 
+rule lineages_csv:
+    input:
+        "outputs/{NAME}-links.csv",
+    output:
+        "outputs/{NAME}.lineages.csv",
+    shell: """
+        ./taxid-to-lineages.taxonkit.py {input} -o {output}
+    """
+
 rule make_invertebrates_csv:
     input:
         sub_from='outputs/bilateria-links.csv',

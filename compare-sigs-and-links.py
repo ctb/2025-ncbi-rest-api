@@ -63,7 +63,8 @@ def main():
             for acc in link_accs - sketch_accs:
                 row = acc_to_links[acc]
                 w.writerow([row['accession'],
-                            row['name']])
+                            row['name'],
+                            row['taxid']])
                 n_saved += 1
 
             print(f"saved {n_saved} rows to '{args.save_missing_links}'")
