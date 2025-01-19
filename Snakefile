@@ -20,6 +20,8 @@ ADD_OTHER=['outputs/bilateria-minus-vertebrates-links.csv',
 SKETCH_NAMES = ['fungi',
                 'eukaryotes-other',
                 'metazoa-minus-bilateria',
+                'bilateria-minus-vertebrates',
+                'extra-bilateria-minus-vertebrates',
                 ]
 
 TEST_NAMES_TO_TAX_ID = {
@@ -69,7 +71,7 @@ rule get_tax:
     output:
         "outputs/{NAME}-dataset-reports.pickle"
     params:
-        tax_id = lambda w: { **NAMES_TO_TAX_ID, **TEST_NAMES_TO_TAX_ID}[w.NAME]
+        tax_id = lambda w: { **NAMES_TO_TAX_ID, **TEST_NAMES_TO_TAX_ID}.get(w.NAME)
     shell: """
        ./1-get-by-tax.py --taxons {params.tax_id} -o {output}
     """
@@ -141,5 +143,5 @@ rule gbsketch:
     shell: """
         sourmash scripts gbsketch {input} -n 9 -r 10 -p k=21,k=31,k=51,dna \
             --failed {output.fail} --checksum-fail {output.check_fail} \
-            -o {output.sigs} -c {threads}
+            -o {output.sigs} -c {threads} --batch 50
     """

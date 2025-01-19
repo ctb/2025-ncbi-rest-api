@@ -59,12 +59,11 @@ def main():
             w = csv.writer(outfp)
             n_saved = 0
 
-            w.writerow(['accession', 'name', 'ftp_path'])
+            w.writerow(['accession', 'name'])
             for acc in link_accs - sketch_accs:
                 row = acc_to_links[acc]
                 w.writerow([row['accession'],
-                            row['name'],
-                            row['ftp_path']])
+                            row['name']])
                 n_saved += 1
 
             print(f"saved {n_saved} rows to '{args.save_missing_links}'")
