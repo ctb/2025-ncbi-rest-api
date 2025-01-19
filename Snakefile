@@ -30,6 +30,7 @@ TEST_NAMES_TO_TAX_ID = {
     'diplomonads': 5738,
 }
 TEST_ADD_OTHER=['outputs/diplomonads-minus-giardia-links.csv']
+TEST_SKETCH_NAMES = ['giardia', 'toxo']
 
 rule default:
     input:
@@ -45,7 +46,19 @@ rule test:
 
 rule sketch:
     input:
-        expand("sketches/{NAME}.sig.zip", NAME=SKETCH_NAMES)
+        expand("sketches/{NAME}.sig.zip", NAME=SKETCH_NAMES),
+
+rule test_sketch:
+    input:
+        expand("sketches/{NAME}.sig.zip", NAME=TEST_SKETCH_NAMES),
+
+rule downsample:
+    input:
+        expand("downsampled/{NAME}.k51.s100_000.sig.zip", NAME=SKETCH_NAMES),
+
+rule merge:
+    input:
+        expand("merged/{NAME}-merged.k51.s100_000.sig.zip", NAME=SKETCH_NAMES),
 
 rule upset_plot:
     input:
@@ -144,4 +157,24 @@ rule gbsketch:
         sourmash scripts gbsketch {input} -n 9 -r 10 -p k=21,k=31,k=51,dna \
             --failed {output.fail} --checksum-fail {output.check_fail} \
             -o {output.sigs} -c {threads} --batch 50
+    """
+
+
+rule downsample_sig:
+    input:
+        "sketches/{NAME}.sig.zip",
+    output:
+        "downsampled/{NAME}.k51.s100_000.sig.zip",
+    shell: """
+        sourmash sig downsample -k 51 -s 100_000 {input} -o {output}
+    """
+
+rule merge_sig:
+    input:
+        "downsampled/{NAME}.k51.s100_100.sig.zip",
+    output:
+        "merged/{NAME}-merged.k51.s100_100.sig.zip",
+    shell: """
+        sourmash sig merge -k 51 -s 100_000 {input} -o {output} \
+           --set-name {wildcards.NAME}-merged
     """
