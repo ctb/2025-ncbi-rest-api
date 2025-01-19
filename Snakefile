@@ -28,6 +28,7 @@ TEST_NAMES_TO_TAX_ID = {
     'diplomonads': 5738,
 }
 TEST_ADD_OTHER=['outputs/diplomonads-minus-giardia-links.csv']
+TEST_SKETCH_NAMES = ['giardia', 'toxo']
 
 rule default:
     input:
@@ -44,6 +45,10 @@ rule test:
 rule sketch:
     input:
         expand("sketches/{NAME}.sig.zip", NAME=SKETCH_NAMES),
+
+rule test_sketch:
+    input:
+        expand("sketches/{NAME}.sig.zip", NAME=TEST_SKETCH_NAMES),
 
 rule downsample:
     input:

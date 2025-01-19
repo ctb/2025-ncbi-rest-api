@@ -91,7 +91,10 @@ def main(args):
 
     failed_lineages += n_fail
     print(f"output {lineages_count} lineages")
-    print(f"failed {failed_lineages} lineages")
+    if failed_lineages:
+        print(f"failed to find {failed_lineages} lineages")
+    else:
+        print("all lineages succeeded!")
                     
 
 if __name__ == "__main__":
