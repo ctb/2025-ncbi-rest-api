@@ -10,7 +10,8 @@ NAMES_TO_TAX_ID = {
 ADD_OTHER=['outputs/bilateria-minus-vertebrates-links.csv',
            'outputs/metazoa-minus-bilateria-links.csv',
            'outputs/eukaryotes-other-links.csv',
-           'outputs/extra-vertebrates-links.csv']
+#           'outputs/extra-vertebrates-links.csv'
+           ]
            
 
 # omit really large ones and already done:
@@ -22,7 +23,7 @@ SKETCH_NAMES = ['fungi',
                 'eukaryotes-other',
                 'metazoa-minus-bilateria',
                 'bilateria-minus-vertebrates',
-                'extra-bilateria-minus-vertebrates',
+#                'extra-bilateria-minus-vertebrates',
                 ]
 
 TEST_NAMES_TO_TAX_ID = {
@@ -38,6 +39,7 @@ rule default:
         expand("outputs/{NAME}-links.csv", NAME=set(NAMES_TO_TAX_ID)),
         ADD_OTHER,
         'outputs/upsetplot.png',
+        'outputs/eukaryotes.lineages.csv',
 
 rule test:
     input:
