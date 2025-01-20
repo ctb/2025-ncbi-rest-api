@@ -9,7 +9,8 @@ NAMES_TO_TAX_ID = {
 
 ADD_OTHER=['outputs/bilateria-minus-vertebrates-links.csv',
            'outputs/metazoa-minus-bilateria-links.csv',
-           'outputs/eukaryotes-other-links.csv']
+           'outputs/eukaryotes-other-links.csv',
+           'outputs/extra-vertebrates-links.csv']
            
 
 # omit really large ones and already done:

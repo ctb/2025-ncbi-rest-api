@@ -16,22 +16,25 @@ from sourmash.manifest import CollectionManifest
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('--links-csvs', nargs='+', required=True,
-                   help='links CSVs')
-    p.add_argument('--sigs', nargs='+', required=True,
-                   help='sourmash sketches/databases')
-    p.add_argument('--save-missing-links',
-                   help='save links entries not present to this CSV')
-    p.add_argument('--save-matching-to-manifest',
-                   help='make a standalone manifest containing the sketches matching to the links')
+    p.add_argument("--links-csvs", nargs="+", required=True, help="links CSVs")
+    p.add_argument(
+        "--sigs", nargs="+", required=True, help="sourmash sketches/databases"
+    )
+    p.add_argument(
+        "--save-missing-links", help="save links entries not present to this CSV"
+    )
+    p.add_argument(
+        "--save-matching-to-manifest",
+        help="make a standalone manifest containing the sketches matching to the links",
+    )
     args = p.parse_args()
 
     acc_to_links = {}
     for filename in args.links_csvs:
-        with open(filename, 'r', newline='') as fp:
+        with open(filename, "r", newline="") as fp:
             r = csv.DictReader(fp)
             for row in r:
-                acc_to_links[row['accession']] = row
+                acc_to_links[row["accession"]] = row
 
     print(f"loaded {len(acc_to_links)} distinct accessions from links CSVs.")
 
@@ -40,8 +43,8 @@ def main():
         db = sourmash.load_file_as_index(dbname)
         mf = db.manifest
         for row in mf.rows:
-            name = row['name']
-            ident = name.split(' ')[0]
+            name = row["name"]
+            ident = name.split(" ")[0]
             acc_to_sketchname[ident] = name
 
     print(f"loaded {len(acc_to_sketchname)} distinct accessions from sigs.")
@@ -55,22 +58,20 @@ def main():
     print(f"{len(link_accs - sketch_accs)} only in links.")
 
     if args.save_missing_links:
-        with open(args.save_missing_links, 'w', newline='') as outfp:
+        with open(args.save_missing_links, "w", newline="") as outfp:
             w = csv.writer(outfp)
             n_saved = 0
 
-            w.writerow(['accession', 'name'])
+            w.writerow(["accession", "name", "taxid"])
             for acc in link_accs - sketch_accs:
                 row = acc_to_links[acc]
-                w.writerow([row['accession'],
-                            row['name'],
-                            row['taxid']])
+                w.writerow([row["accession"], row["name"], row["taxid"]])
                 n_saved += 1
 
             print(f"saved {n_saved} rows to '{args.save_missing_links}'")
 
     if args.save_matching_to_manifest:
-        pl = SignaturePicklist('ident')
+        pl = SignaturePicklist("ident")
         pl.init(common)
 
         rows = []
@@ -82,14 +83,15 @@ def main():
 
             mf = db.manifest
             for row in mf.rows:
-                row['internal_location'] = iloc
+                row["internal_location"] = iloc
                 rows.append(row)
 
         mf = CollectionManifest(rows)
-        mf.write_to_filename(args.save_matching_to_manifest,
-                             ok_if_exists=True, database_format="csv")
+        mf.write_to_filename(
+            args.save_matching_to_manifest, ok_if_exists=True, database_format="csv"
+        )
         print(f"wrote {len(mf)} manifest rows to '{args.save_matching_to_manifest}'")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())
