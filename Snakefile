@@ -181,7 +181,7 @@ rule gbsketch:
     input:
         "outputs/{NAME}-links.csv",
     output:
-        sigs=protected("sketches/{NAME}.sig.zip"),
+        sigs=protected(touch("sketches/{NAME}.sig.zip")),
         check_fail="sketches/{NAME}.gbsketch-check-fail.txt",
         fail="sketches/{NAME}.gbsketch-fail.txt",
     threads: 16
