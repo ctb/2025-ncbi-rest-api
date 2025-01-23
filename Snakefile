@@ -47,6 +47,28 @@ rule test:
         TEST_ADD_OTHER,
         'outputs/test-upsetplot.png',
 
+rule make_combined_manifest:
+    output:
+        "sketches/eukaryotes.mf.csv"
+    shell: """
+       rm -f {output}
+       sourmash sig collect -F csv sketches/*.sig.zip \
+          sketches/extra-vertebrates.*.zip \
+          -o {output}
+       sourmash sig summarize {output}
+    """
+
+rule check_combined_manifest:
+    input:
+        mf="sketches/eukaryotes.mf.csv",
+        links="outputs/eukaryotes-links.csv",
+    output:
+        missing="outputs/eukaryotes-missing-links.csv",
+    shell: """
+        ./compare-sigs-and-links.py --sigs {input.mf} --links {input.links} \
+            --save-missing {output.missing}
+    """
+
 rule sketch:
     input:
         expand("sketches/{NAME}.sig.zip", NAME=SKETCH_NAMES),
