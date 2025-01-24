@@ -17,6 +17,7 @@ rule default:
     input:
         expand("outputs/{NAME}-links.csv", NAME=set(NAMES_TO_TAX_ID)),
         'outputs/eukaryotes.lineages.csv',
+        'genomes/fungi-top10.d',
 
 rule get_tax:
     output:
@@ -79,4 +80,24 @@ rule eukaryotes_other_csv:
     shell: """
         ./subtract-links.py -1 {input.sub_from} \
             -2 {input.sub} -o {output}
+    """
+
+rule fungi_top10:
+    input:
+        "outputs/fungi-links.csv",
+    output:
+        "outputs/fungi-top10-links.csv",
+    shell: "head -11 {input} > {output}"
+
+rule directsketch_download:
+    input:
+        "outputs/{name}-links.csv",
+    output:
+        dir=directory("genomes/{name}.d/"),
+        failed="genomes/fail-{name}.txt",
+        checkfail="genomes/checkfail-{name}.txt",
+    shell: """
+       sourmash scripts gbsketch --download-only --keep-fasta --genomes-only \
+          {input} -f {output.dir} --failed {output.failed} \
+          --checksum-fail {output.checkfail}
     """
