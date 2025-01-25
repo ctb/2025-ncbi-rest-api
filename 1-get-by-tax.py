@@ -31,7 +31,7 @@ def main():
     basic_params = {}
     basic_params["page_size"] = 1000
     basic_params["api_key"] = API_KEY
-    basic_params["filters.reference_only"] = "true"
+#    basic_params["filters.reference_only"] = "true"
 
     taxons = ",".join(args.taxons)
     print("retrieving for taxon(s):", taxons)

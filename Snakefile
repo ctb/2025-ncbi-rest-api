@@ -5,6 +5,7 @@ NAMES_TO_TAX_ID = {
     'fungi': 4751,
     'bilateria': 33213,
     'vertebrates': 7742,
+    'viruses': 10239,
     }
 
 ADD_OTHER=['outputs/bilateria-minus-vertebrates-links.csv',
