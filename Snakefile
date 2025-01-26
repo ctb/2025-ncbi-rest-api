@@ -12,13 +12,16 @@ ADD_OTHER=['outputs/bilateria-minus-vertebrates-links.csv',
            'outputs/eukaryotes-other-links.csv',
            ]
            
-
+# pull down the various nodes in NAMES_TO_TAX_ID, build a lineages CSV file,
+# and download 10 fungal genomes.
 rule default:
     input:
         expand("outputs/{NAME}-links.csv", NAME=set(NAMES_TO_TAX_ID)),
         'outputs/eukaryotes.lineages.csv',
         'genomes/fungi-top10.d',
 
+# retrieve all reference genomes under node => build a pickle file
+# containing that info.
 rule get_tax:
     output:
         "outputs/{NAME}-dataset-reports.pickle"
