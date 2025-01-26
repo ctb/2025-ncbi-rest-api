@@ -72,7 +72,6 @@ def taxonkit_get_lineages_as_dict(
         if len(names) != n_taxids or len(names) != len(ranks):
             print(f"ERROR: taxonkit lineage for taxid {taxid} has mismatched lengths")
             print(f"names: {len(names)} taxids: {n_taxids} ranks: {len(ranks)}")
-            failed = True
         else:
             taxinfo[taxid] = (taxpath, names)
 
@@ -80,26 +79,31 @@ def taxonkit_get_lineages_as_dict(
 
 
 def main(args):
-    w = csv.writer(args.output)
-    w.writerow(["ident", "taxid", "taxpath"] + WANT_TAXONOMY)
-
     # get the taxid from input csv #
+    print(f"reading accession & taxid info from '{args.info}'")
     taxid2ident = {}
+    accessions = []
     with open(args.info, "r") as f:
         reader = csv.DictReader(f, delimiter=",")
         for row in reader:
             ident = row["accession"]
-            taxid = row["taxid"]
-            taxid2ident[int(taxid)] = ident
+            taxid = int(row["taxid"])
+            taxid2ident[taxid] = ident
+            accessions.append((ident, taxid))
 
+    print(f"got {len(taxid2ident)} taxids")
     # now get all lineages for the taxids
     taxid2lineage, n_fail = taxonkit_get_lineages_as_dict(
         taxid2ident.keys(), ranks=WANT_TAXONOMY
     )
 
+    print(f"outputting lineages to '{args.output}'")
+    w = csv.writer(args.output)
+    w.writerow(["ident", "taxid", "taxpath"] + WANT_TAXONOMY)
+
     lineages_count = 0
     failed_lineages = 0
-    for taxid, ident in taxid2ident.items():
+    for ident, taxid in accessions:
         lineage = taxid2lineage.get(taxid)
         failed = False
         if lineage:

@@ -21,6 +21,9 @@ def main():
     p.add_argument("--taxons", nargs="+", default=["2759"])  # eukaryotes
     p.add_argument("-o", "--save-pickle", required=True)
     p.add_argument("--test-mode", action="store_true")
+    p.add_argument("--all-genomes",
+                   action="store_true",
+                   help="get all genomes, not just reference genomes")
     args = p.parse_args()
 
     API_KEY = os.environ.get("NCBI_API_KEY")
@@ -31,7 +34,11 @@ def main():
     basic_params = {}
     basic_params["page_size"] = 1000
     basic_params["api_key"] = API_KEY
-    basic_params["filters.reference_only"] = "true"
+    if not args.all_genomes:
+        print("retrieving only records for reference genomes")
+        basic_params["filters.reference_only"] = "true"
+    else:
+        print("getting ALL genomes because --all-genomes was specified")
 
     taxons = ",".join(args.taxons)
     print("retrieving for taxon(s):", taxons)
