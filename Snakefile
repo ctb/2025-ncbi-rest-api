@@ -101,6 +101,5 @@ rule directsketch_download:
         checkfail="genomes/checkfail-{name}.txt",
     shell: """
        sourmash scripts gbsketch --download-only --keep-fasta --genomes-only \
-          {input} -f {output.dir} --failed {output.failed} \
-          --checksum-fail {output.checkfail}
+          {input} -f {output.dir}
     """

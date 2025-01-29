@@ -10,4 +10,4 @@ dependencies:
     - python==3.12
     - snakemake-minimal
     - pandas
-    - sourmash_plugin_directsketch
+    - sourmash_plugin_directsketch>=0.5.0

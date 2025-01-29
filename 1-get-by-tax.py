@@ -26,14 +26,16 @@ def main():
                    help="get all genomes, not just reference genomes")
     args = p.parse_args()
 
+    basic_params = {}
     API_KEY = os.environ.get("NCBI_API_KEY")
     if not API_KEY:
-        assert 0, "you must set the NCBI_API_KEY environment variable"
+        #assert 0, "you must set the NCBI_API_KEY environment variable"
+        pass
+    else:
+        basic_params["api_key"] = API_KEY
 
-    headers = {}
-    basic_params = {}
     basic_params["page_size"] = 1000
-    basic_params["api_key"] = API_KEY
+
     if not args.all_genomes:
         print("retrieving only records for reference genomes")
         basic_params["filters.reference_only"] = "true"
@@ -47,7 +49,6 @@ def main():
     r = requests.get(
         f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/{taxons}/dataset_report",
         params=basic_params,
-        headers=headers,
     )
     data = r.json()
 
@@ -61,7 +62,7 @@ def main():
         params["page_token"] = next_page
 
         r = requests.get(
-            NCBI_API_URL + f"{taxons}/dataset_report", headers=headers, params=params
+            NCBI_API_URL + f"{taxons}/dataset_report", params=params
         )
         data = r.json()
         save.append(data)
