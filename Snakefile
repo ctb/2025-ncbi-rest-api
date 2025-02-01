@@ -1,71 +1,105 @@
-# @CTB config-ify
-TEST_MODE=False
-
 NAMES_TO_TAX_ID = {
     'eukaryotes': 2759,
     'metazoa': 33208,
     'plants': 33090,
     'fungi': 4751,
+    'bilateria': 33213,
+    'vertebrates': 7742,
     }
 
-SKETCH_NAMES = ['fungi', 'metazoa', 'euk-other']
-
-if TEST_MODE:
-    NAMES_TO_TAX_ID = {
-        'giardia': 5740,
-        'toxo': 5810,
-        }
-    SKETCH_NAMES = set(NAMES_TO_TAX_ID)
-    TEST_MODE_FLAG="--test-mode"
-else:
-    TEST_MODE_FLAG=""
-
+ADD_OTHER=['outputs/bilateria-minus-vertebrates-links.csv',
+           'outputs/metazoa-minus-bilateria-links.csv',
+           'outputs/eukaryotes-other-links.csv',
+           ]
+           
+# pull down the various nodes in NAMES_TO_TAX_ID, build a lineages CSV file,
+# and download 10 fungal genomes.
 rule default:
     input:
-        expand("outputs/{NAME}-links.csv", NAME=set(NAMES_TO_TAX_ID))
+        expand("outputs/{NAME}-links.csv", NAME=set(NAMES_TO_TAX_ID)),
+        'outputs/eukaryotes.lineages.csv',
+        'genomes/fungi-top10.d',
 
-rule sketch:
-    input:
-        expand("sketches/{NAME}.sig.zip", NAME=SKETCH_NAMES)
-
+# retrieve all reference genomes under node => build a pickle file
+# containing that info.
 rule get_tax:
     output:
         "outputs/{NAME}-dataset-reports.pickle"
     params:
         tax_id = lambda w: NAMES_TO_TAX_ID[w.NAME]
     shell: """
-       ./1-get-by-tax.py --taxons {params.tax_id} -o {output} {TEST_MODE_FLAG}
-    """
-
-
-rule get_links:
-    input:
-        datasets="outputs/{NAME}-dataset-reports.pickle",
-        round1="outputs/round1-{NAME}-links.pickle",
-    output:
-        "outputs/{NAME}-links.pickle"
-    shell: """
-       ./2-get-genome-links.py {input.datasets} -i {input.round1} -o {output} {TEST_MODE_FLAG}
+       ./1-get-by-tax.py --taxons {params.tax_id} -o {output}
     """
 
 rule parse_links:
     input:
-        "outputs/{NAME}-links.pickle",
+        datasets="outputs/{NAME}-dataset-reports.pickle",
     output: 
         "outputs/{NAME}-links.csv",
     shell: """
-        ./3-parse-links.py {input} -o {output}
+        ./2-output-directsketch-csv.py {input} -o {output}
     """
 
-rule gbsketch:
+rule lineages_csv:
     input:
         "outputs/{NAME}-links.csv",
     output:
-        sigs="sketches/{NAME}.sig.zip",
-        check_fail="sketches/{NAME}.gbsketch-check-fail.txt",
-        fail="sketches/{NAME}.gbsketch-fail.txt",
+        "outputs/{NAME}.lineages.csv",
     shell: """
-        sourmash scripts gbsketch {input} -n 1 -p k=21,k=31,k=51,dna \
-            --failed {output.fail} --checksum-fail {output.check_fail} \
-            -o {output.sigs}
+        ./taxid-to-lineages.taxonkit.py {input} -o {output}
+    """
+
+rule make_invertebrates_csv:
+    input:
+        sub_from='outputs/bilateria-links.csv',
+        sub='outputs/vertebrates-links.csv',
+    output:
+        'outputs/bilateria-minus-vertebrates-links.csv',
+    shell: """
+        ./subtract-links.py -1 {input.sub_from} \
+            -2 {input.sub} -o {output}
+    """
+
+rule make_metazoa_sub_bilateria_csv:
+    input:
+        sub_from='outputs/metazoa-links.csv',
+        sub='outputs/bilateria-links.csv',
+    output:
+        'outputs/metazoa-minus-bilateria-links.csv',
+    shell: """
+        ./subtract-links.py -1 {input.sub_from} \
+            -2 {input.sub} -o {output}
+    """
+
+rule eukaryotes_other_csv:
+    input:
+        sub_from='outputs/eukaryotes-links.csv',
+        sub=['outputs/metazoa-links.csv',
+             'outputs/plants-links.csv',
+             'outputs/fungi-links.csv',
+             ]
+    output:
+        'outputs/eukaryotes-other-links.csv',
+    shell: """
+        ./subtract-links.py -1 {input.sub_from} \
+            -2 {input.sub} -o {output}
+    """
+
+rule fungi_top10:
+    input:
+        "outputs/fungi-links.csv",
+    output:
+        "outputs/fungi-top10-links.csv",
+    shell: "head -11 {input} > {output}"
+
+rule directsketch_download:
+    input:
+        "outputs/{name}-links.csv",
+    output:
+        dir=directory("genomes/{name}.d/"),
+        failed="genomes/fail-{name}.txt",
+        checkfail="genomes/checkfail-{name}.txt",
+    shell: """
+       sourmash scripts gbsketch --download-only --keep-fasta --genomes-only \
+          {input} -f {output.dir}
     """

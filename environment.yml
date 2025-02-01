@@ -1,4 +1,4 @@
-name: branchwater-dev
+name: ncbi-rest-api
 channels:
     - conda-forge
     - bioconda
@@ -10,3 +10,4 @@ dependencies:
     - python==3.12
     - snakemake-minimal
     - pandas
+    - sourmash_plugin_directsketch>=0.5.0
