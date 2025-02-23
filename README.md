@@ -12,6 +12,7 @@ the
 to download all of the genomes in bulk.
 
 Specifically, this repo contains code to:
+* Download a dataset zip for one or more accessions;
 * Retrieve genome accessions for all eukaryotic genomes.
 * Create "subtracted" lists for polyphyletic taxonomic nodes such as
   invertebrates, non-bilateria, and "other" eukaryotes.

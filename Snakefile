@@ -13,12 +13,20 @@ ADD_OTHER=['outputs/bilateria-minus-vertebrates-links.csv',
            ]
            
 # pull down the various nodes in NAMES_TO_TAX_ID, build a lineages CSV file,
-# and download 10 fungal genomes.
+# and download 10 fungal genomes; also download a single data set file.
 rule default:
     input:
         expand("outputs/{NAME}-links.csv", NAME=set(NAMES_TO_TAX_ID)),
         'outputs/eukaryotes.lineages.csv',
         'genomes/fungi-top10.d',
+        'GCF_963082475.1.dataset.zip',
+
+rule download_dataset:
+    output:
+        'GCF_963082475.1.dataset.zip',
+    shell: """
+        ./1-download-genome.py GCF_963082475.1 -o {output}
+    """
 
 # retrieve all reference genomes under node => build a pickle file
 # containing that info.
